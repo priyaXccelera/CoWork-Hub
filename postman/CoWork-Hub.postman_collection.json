@@ -1,51 +1,1386 @@
 {
   "info": {
     "name": "CoWork Hub API",
-    "description": "CoWork Hub backend collection, including the Reviews feature (create/list/get/edit/delete) and its business-rule edge cases.",
+    "description": "Complete collection for all CoWork Hub API operations. Seeded API key variables authenticate against a freshly initialized database. Each request includes a saved example response.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:26986" },
-    { "key": "adminKey", "value": "local-dev-admin-key-change-me" },
-    { "key": "adminApiKey", "value": "seed-admin-key-1" },
-    { "key": "memberApiKey", "value": "seed-member-key-2" },
-    { "key": "otherMemberApiKey", "value": "seed-member-key-3" },
-    { "key": "spaceId", "value": "1" },
-    { "key": "completedBookingId", "value": "1" },
-    { "key": "confirmedBookingId", "value": "4" },
-    { "key": "reviewId", "value": "1" }
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:26986"
+    },
+    {
+      "key": "adminKey",
+      "value": "local-dev-admin-key-change-me"
+    },
+    {
+      "key": "adminApiKey",
+      "value": "seed-admin-key-1"
+    },
+    {
+      "key": "memberApiKey",
+      "value": "seed-member-key-2"
+    },
+    {
+      "key": "otherMemberApiKey",
+      "value": "seed-member-key-3"
+    },
+    {
+      "key": "userId",
+      "value": "2"
+    },
+    {
+      "key": "membershipPlanId",
+      "value": "1"
+    },
+    {
+      "key": "spaceId",
+      "value": "1"
+    },
+    {
+      "key": "bookingId",
+      "value": "4"
+    },
+    {
+      "key": "invoiceId",
+      "value": "1"
+    },
+    {
+      "key": "reviewId",
+      "value": "1"
+    },
+    {
+      "key": "apiKeyId",
+      "value": "1"
+    }
   ],
   "item": [
+    {
+      "name": "API Keys",
+      "item": [
+        {
+          "name": "Create API key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Admin-Key",
+                "value": "{{adminKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/api-keys"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"postman-key\",\n  \"role\": \"ADMIN\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Admin-Key",
+                    "value": "{{adminKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/api-keys"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"postman-key\",\n  \"role\": \"ADMIN\"\n}"
+                }
+              },
+              "status": "OK",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\":6,\"name\":\"postman-key\",\"role\":\"ADMIN\",\"userId\":null,\"active\":true,\"apiKey\":\"raw-key-returned-once\",\"createdAt\":\"2025-01-01T10:00:00\",\"lastUsedAt\":null}"
+            }
+          ]
+        },
+        {
+          "name": "List API keys",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Admin-Key",
+                "value": "{{adminKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/api-keys"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Admin-Key",
+                    "value": "{{adminKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/api-keys"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\":6,\"name\":\"postman-key\",\"role\":\"ADMIN\",\"userId\":null,\"active\":true,\"apiKey\":\"raw-key-returned-once\",\"createdAt\":\"2025-01-01T10:00:00\",\"lastUsedAt\":null}"
+            }
+          ]
+        },
+        {
+          "name": "Revoke API key",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Admin-Key",
+                "value": "{{adminKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/api-keys/{{apiKeyId}}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "X-Admin-Key",
+                    "value": "{{adminKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/api-keys/{{apiKeyId}}"
+                }
+              },
+              "status": "OK",
+              "code": 204,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{adminApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Member\",\n  \"email\": \"postman.member@example.test\",\n  \"role\": \"MEMBER\",\n  \"membershipPlanId\": 1,\n  \"creditHoursRemaining\": 10,\n  \"status\": \"ACTIVE\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{adminApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/users"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Postman Member\",\n  \"email\": \"postman.member@example.test\",\n  \"role\": \"MEMBER\",\n  \"membershipPlanId\": 1,\n  \"creditHoursRemaining\": 10,\n  \"status\": \"ACTIVE\"\n}"
+                }
+              },
+              "status": "OK",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\":1,\"createdAt\":\"2025-01-01T10:00:00\",\"updatedAt\":\"2025-01-01T10:00:00\"}"
+            }
+          ]
+        },
+        {
+          "name": "List users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{adminApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users?offset=0&limit=20"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{adminApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/users?offset=0&limit=20"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"content\":[],\"totalElements\":0,\"totalPages\":0,\"size\":20,\"number\":0}"
+            }
+          ]
+        },
+        {
+          "name": "Get user",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{adminApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/{{userId}}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{adminApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/users/{{userId}}"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\":1,\"createdAt\":\"2025-01-01T10:00:00\",\"updatedAt\":\"2025-01-01T10:00:00\"}"
+            }
+          ]
+        },
+        {
+          "name": "Update user",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{adminApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/{{userId}}"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Member\",\n  \"email\": \"postman.member@example.test\",\n  \"role\": \"MEMBER\",\n  \"membershipPlanId\": 1,\n  \"creditHoursRemaining\": 10,\n  \"status\": \"ACTIVE\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{adminApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/users/{{userId}}"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Postman Member\",\n  \"email\": \"postman.member@example.test\",\n  \"role\": \"MEMBER\",\n  \"membershipPlanId\": 1,\n  \"creditHoursRemaining\": 10,\n  \"status\": \"ACTIVE\"\n}"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\":1,\"createdAt\":\"2025-01-01T10:00:00\",\"updatedAt\":\"2025-01-01T10:00:00\"}"
+            }
+          ]
+        },
+        {
+          "name": "Delete user",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{adminApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/{{userId}}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{adminApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/users/{{userId}}"
+                }
+              },
+              "status": "OK",
+              "code": 204,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Membership Plans",
+      "item": [
+        {
+          "name": "Create Membership plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{adminApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/membership-plans"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Plan\",\n  \"monthlyPrice\": 49,\n  \"includedCreditHours\": 10,\n  \"overageRatePerHour\": 5\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{adminApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/membership-plans"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Postman Plan\",\n  \"monthlyPrice\": 49,\n  \"includedCreditHours\": 10,\n  \"overageRatePerHour\": 5\n}"
+                }
+              },
+              "status": "OK",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\":1,\"createdAt\":\"2025-01-01T10:00:00\",\"updatedAt\":\"2025-01-01T10:00:00\"}"
+            }
+          ]
+        },
+        {
+          "name": "List membership plans",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{adminApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/membership-plans?offset=0&limit=20"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{adminApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/membership-plans?offset=0&limit=20"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"content\":[],\"totalElements\":0,\"totalPages\":0,\"size\":20,\"number\":0}"
+            }
+          ]
+        },
+        {
+          "name": "Get membership plan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{adminApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/membership-plans/{{membershipPlanId}}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{adminApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/membership-plans/{{membershipPlanId}}"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\":1,\"createdAt\":\"2025-01-01T10:00:00\",\"updatedAt\":\"2025-01-01T10:00:00\"}"
+            }
+          ]
+        },
+        {
+          "name": "Update membership plan",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{adminApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/membership-plans/{{membershipPlanId}}"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Plan\",\n  \"monthlyPrice\": 49,\n  \"includedCreditHours\": 10,\n  \"overageRatePerHour\": 5\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{adminApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/membership-plans/{{membershipPlanId}}"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Postman Plan\",\n  \"monthlyPrice\": 49,\n  \"includedCreditHours\": 10,\n  \"overageRatePerHour\": 5\n}"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\":1,\"createdAt\":\"2025-01-01T10:00:00\",\"updatedAt\":\"2025-01-01T10:00:00\"}"
+            }
+          ]
+        },
+        {
+          "name": "Delete membership plan",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{adminApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/membership-plans/{{membershipPlanId}}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{adminApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/membership-plans/{{membershipPlanId}}"
+                }
+              },
+              "status": "OK",
+              "code": 204,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
     {
       "name": "Spaces",
       "item": [
         {
-          "name": "List spaces (includes averageRating/totalReviews)",
+          "name": "Create Space",
           "request": {
-            "method": "GET",
-            "header": [{ "key": "X-API-Key", "value": "{{memberApiKey}}" }],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{adminApiKey}}"
+              }
+            ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/spaces?offset=0&limit=20",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "spaces"],
-              "query": [
-                { "key": "offset", "value": "0" },
-                { "key": "limit", "value": "20" }
-              ]
+              "raw": "{{baseUrl}}/api/v1/spaces"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Desk\",\n  \"type\": \"DESK\",\n  \"capacity\": 1,\n  \"hourlyRate\": 5,\n  \"isActive\": true\n}"
             }
-          }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{adminApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/spaces"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Postman Desk\",\n  \"type\": \"DESK\",\n  \"capacity\": 1,\n  \"hourlyRate\": 5,\n  \"isActive\": true\n}"
+                }
+              },
+              "status": "OK",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\":1,\"createdAt\":\"2025-01-01T10:00:00\",\"updatedAt\":\"2025-01-01T10:00:00\"}"
+            }
+          ]
         },
         {
-          "name": "Get space by id (includes averageRating/totalReviews)",
+          "name": "List spaces",
           "request": {
             "method": "GET",
-            "header": [{ "key": "X-API-Key", "value": "{{memberApiKey}}" }],
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{adminApiKey}}"
+              }
+            ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/spaces/{{spaceId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "spaces", "{{spaceId}}"]
+              "raw": "{{baseUrl}}/api/v1/spaces?offset=0&limit=20"
             }
-          }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{adminApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/spaces?offset=0&limit=20"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"content\":[],\"totalElements\":0,\"totalPages\":0,\"size\":20,\"number\":0}"
+            }
+          ]
+        },
+        {
+          "name": "Get space",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{adminApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/spaces/{{spaceId}}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{adminApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/spaces/{{spaceId}}"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\":1,\"createdAt\":\"2025-01-01T10:00:00\",\"updatedAt\":\"2025-01-01T10:00:00\"}"
+            }
+          ]
+        },
+        {
+          "name": "Update space",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{adminApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/spaces/{{spaceId}}"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Desk\",\n  \"type\": \"DESK\",\n  \"capacity\": 1,\n  \"hourlyRate\": 5,\n  \"isActive\": true\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{adminApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/spaces/{{spaceId}}"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Postman Desk\",\n  \"type\": \"DESK\",\n  \"capacity\": 1,\n  \"hourlyRate\": 5,\n  \"isActive\": true\n}"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\":1,\"createdAt\":\"2025-01-01T10:00:00\",\"updatedAt\":\"2025-01-01T10:00:00\"}"
+            }
+          ]
+        },
+        {
+          "name": "Delete space",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{adminApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/spaces/{{spaceId}}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{adminApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/spaces/{{spaceId}}"
+                }
+              },
+              "status": "OK",
+              "code": 204,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Create booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{memberApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/bookings"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"spaceId\": 1,\n  \"startTime\": \"2030-01-15T09:00:00\",\n  \"endTime\": \"2030-01-15T11:00:00\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{memberApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/bookings"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"spaceId\": 1,\n  \"startTime\": \"2030-01-15T09:00:00\",\n  \"endTime\": \"2030-01-15T11:00:00\"\n}"
+                }
+              },
+              "status": "OK",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\":1,\"createdAt\":\"2025-01-01T10:00:00\",\"updatedAt\":\"2025-01-01T10:00:00\"}"
+            }
+          ]
+        },
+        {
+          "name": "List bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{memberApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/bookings?offset=0&limit=20&status=CONFIRMED"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{memberApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/bookings?offset=0&limit=20&status=CONFIRMED"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"content\":[],\"totalElements\":0,\"totalPages\":0,\"size\":20,\"number\":0}"
+            }
+          ]
+        },
+        {
+          "name": "Get booking",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{memberApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/bookings/{{bookingId}}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{memberApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/bookings/{{bookingId}}"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\":1,\"createdAt\":\"2025-01-01T10:00:00\",\"updatedAt\":\"2025-01-01T10:00:00\"}"
+            }
+          ]
+        },
+        {
+          "name": "Cancel booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{memberApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/bookings/{{bookingId}}/cancel"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{memberApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/bookings/{{bookingId}}/cancel"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\":1,\"createdAt\":\"2025-01-01T10:00:00\",\"updatedAt\":\"2025-01-01T10:00:00\"}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Invoices",
+      "item": [
+        {
+          "name": "Generate invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{adminApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/invoices/generate"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 2,\n  \"month\": \"2030-01\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{adminApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/invoices/generate"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": 2,\n  \"month\": \"2030-01\"\n}"
+                }
+              },
+              "status": "OK",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\":1,\"createdAt\":\"2025-01-01T10:00:00\",\"updatedAt\":\"2025-01-01T10:00:00\"}"
+            }
+          ]
+        },
+        {
+          "name": "List invoices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{memberApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/invoices?offset=0&limit=20"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{memberApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/invoices?offset=0&limit=20"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"content\":[],\"totalElements\":0,\"totalPages\":0,\"size\":20,\"number\":0}"
+            }
+          ]
+        },
+        {
+          "name": "Get invoice",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{memberApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/invoices/{{invoiceId}}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{memberApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/invoices/{{invoiceId}}"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\":1,\"createdAt\":\"2025-01-01T10:00:00\",\"updatedAt\":\"2025-01-01T10:00:00\"}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Waitlist",
+      "item": [
+        {
+          "name": "Join waitlist",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{memberApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/waitlist"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"spaceId\": 1,\n  \"requestedStart\": \"2030-01-15T09:00:00\",\n  \"requestedEnd\": \"2030-01-15T11:00:00\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{memberApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/waitlist"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"spaceId\": 1,\n  \"requestedStart\": \"2030-01-15T09:00:00\",\n  \"requestedEnd\": \"2030-01-15T11:00:00\"\n}"
+                }
+              },
+              "status": "OK",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\":1,\"createdAt\":\"2025-01-01T10:00:00\",\"updatedAt\":\"2025-01-01T10:00:00\"}"
+            }
+          ]
+        },
+        {
+          "name": "List waitlist",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{memberApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/waitlist?offset=0&limit=20"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{memberApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/waitlist?offset=0&limit=20"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"content\":[],\"totalElements\":0,\"totalPages\":0,\"size\":20,\"number\":0}"
+            }
+          ]
         }
       ]
     },
@@ -53,16 +1388,130 @@
       "name": "Reports",
       "item": [
         {
-          "name": "Space utilization (includes averageRating)",
+          "name": "Space utilization",
           "request": {
             "method": "GET",
-            "header": [{ "key": "X-API-Key", "value": "{{adminApiKey}}" }],
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{adminApiKey}}"
+              }
+            ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/reports/space-utilization",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "reports", "space-utilization"]
+              "raw": "{{baseUrl}}/api/v1/reports/space-utilization?weekStart=2030-01-14"
             }
-          }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{adminApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/reports/space-utilization?weekStart=2030-01-14"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[]"
+            }
+          ]
+        },
+        {
+          "name": "Monthly revenue",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{adminApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reports/revenue?month=2030-01"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{adminApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/reports/revenue?month=2030-01"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"month\":\"2030-01\",\"totalRevenue\":0}"
+            }
+          ]
+        },
+        {
+          "name": "Top members",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{adminApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reports/top-members?limit=5"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{adminApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/reports/top-members?limit=5"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[]"
+            }
+          ]
         }
       ]
     },
@@ -70,221 +1519,483 @@
       "name": "Reviews",
       "item": [
         {
-          "name": "Create review - happy path (member, completed booking)",
+          "name": "Create review",
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "X-API-Key", "value": "{{memberApiKey}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{memberApiKey}}"
+              }
             ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews"
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"bookingId\": {{completedBookingId}},\n  \"rating\": 5,\n  \"comment\": \"Great space, would book again.\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/reviews",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "reviews"]
+              "raw": "{\n  \"bookingId\": 1,\n  \"rating\": 5,\n  \"comment\": \"Great space.\"\n}"
             }
-          }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{memberApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/reviews"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"bookingId\": 1,\n  \"rating\": 5,\n  \"comment\": \"Great space.\"\n}"
+                }
+              },
+              "status": "OK",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\":1,\"createdAt\":\"2025-01-01T10:00:00\",\"updatedAt\":\"2025-01-01T10:00:00\"}"
+            }
+          ]
         },
         {
-          "name": "Create review - EDGE: duplicate review on same booking (expect 409)",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "X-API-Key", "value": "{{memberApiKey}}" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"bookingId\": {{completedBookingId}},\n  \"rating\": 4,\n  \"comment\": \"Trying to review the same booking twice.\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/reviews",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "reviews"]
-            }
-          }
-        },
-        {
-          "name": "Create review - EDGE: booking not COMPLETED (expect 400)",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "X-API-Key", "value": "{{memberApiKey}}" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"bookingId\": {{confirmedBookingId}},\n  \"rating\": 4,\n  \"comment\": \"Booking is still CONFIRMED, not COMPLETED.\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/reviews",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "reviews"]
-            }
-          }
-        },
-        {
-          "name": "Create review - EDGE: rating out of range (expect 400)",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "X-API-Key", "value": "{{memberApiKey}}" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"bookingId\": {{completedBookingId}},\n  \"rating\": 7,\n  \"comment\": \"Rating is out of the allowed 1-5 range.\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/reviews",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "reviews"]
-            }
-          }
-        },
-        {
-          "name": "Create review - EDGE: comment exceeds 500 chars (expect 400)",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "X-API-Key", "value": "{{memberApiKey}}" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"bookingId\": {{completedBookingId}},\n  \"rating\": 3,\n  \"comment\": \"REPLACE_WITH_501_CHAR_STRING\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/reviews",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "reviews"]
-            }
-          }
-        },
-        {
-          "name": "Create review - EDGE: someone else's booking (expect 403)",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "X-API-Key", "value": "{{otherMemberApiKey}}" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"bookingId\": {{completedBookingId}},\n  \"rating\": 3,\n  \"comment\": \"This booking does not belong to me.\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/reviews",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "reviews"]
-            }
-          }
-        },
-        {
-          "name": "List reviews for a space (paginated, newest first)",
+          "name": "List reviews for a space",
           "request": {
             "method": "GET",
-            "header": [{ "key": "X-API-Key", "value": "{{memberApiKey}}" }],
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{memberApiKey}}"
+              }
+            ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/reviews?spaceId={{spaceId}}&offset=0&limit=20",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "reviews"],
-              "query": [
-                { "key": "spaceId", "value": "{{spaceId}}" },
-                { "key": "offset", "value": "0" },
-                { "key": "limit", "value": "20" }
-              ]
+              "raw": "{{baseUrl}}/api/v1/reviews?spaceId={{spaceId}}&offset=0&limit=20"
             }
-          }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{memberApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/reviews?spaceId={{spaceId}}&offset=0&limit=20"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"content\":[],\"totalElements\":0,\"totalPages\":0,\"size\":20,\"number\":0}"
+            }
+          ]
         },
         {
-          "name": "Get single review",
+          "name": "Get review",
           "request": {
             "method": "GET",
-            "header": [{ "key": "X-API-Key", "value": "{{memberApiKey}}" }],
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{memberApiKey}}"
+              }
+            ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/reviews/{{reviewId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "reviews", "{{reviewId}}"]
+              "raw": "{{baseUrl}}/api/v1/reviews/{{reviewId}}"
             }
-          }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{memberApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/reviews/{{reviewId}}"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\":1,\"createdAt\":\"2025-01-01T10:00:00\",\"updatedAt\":\"2025-01-01T10:00:00\"}"
+            }
+          ]
         },
         {
-          "name": "Edit own review",
+          "name": "Update own review",
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "X-API-Key", "value": "{{memberApiKey}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{memberApiKey}}"
+              }
             ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews/{{reviewId}}"
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"rating\": 4,\n  \"comment\": \"Updated my review after a second visit.\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/reviews/{{reviewId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "reviews", "{{reviewId}}"]
+              "raw": "{\n  \"rating\": 4,\n  \"comment\": \"Updated review.\"\n}"
             }
-          }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{memberApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/reviews/{{reviewId}}"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rating\": 4,\n  \"comment\": \"Updated review.\"\n}"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"id\":1,\"createdAt\":\"2025-01-01T10:00:00\",\"updatedAt\":\"2025-01-01T10:00:00\"}"
+            }
+          ]
         },
         {
-          "name": "Edit review - EDGE: editing another member's review (expect 403)",
+          "name": "Delete own review",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{memberApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews/{{reviewId}}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{memberApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/reviews/{{reviewId}}"
+                }
+              },
+              "status": "OK",
+              "code": 204,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Review Edge Cases",
+      "item": [
+        {
+          "name": "Duplicate review for completed booking (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{memberApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookingId\": 1,\n  \"rating\": 5,\n  \"comment\": \"Great space.\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{memberApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/reviews"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"bookingId\": 1,\n  \"rating\": 5,\n  \"comment\": \"Great space.\"\n}"
+                }
+              },
+              "status": "Error",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"timestamp\":\"2025-01-01T10:00:00\",\"status\":409,\"error\":\"Conflict\",\"message\":\"A review already exists for this booking\",\"path\":\"/api/v1/reviews\"}"
+            }
+          ]
+        },
+        {
+          "name": "Review without completed booking (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{memberApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookingId\": 4,\n  \"rating\": 5,\n  \"comment\": \"Invalid booking status.\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{memberApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/reviews"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"bookingId\": 4,\n  \"rating\": 5,\n  \"comment\": \"Invalid booking status.\"\n}"
+                }
+              },
+              "status": "Error",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"timestamp\":\"2025-01-01T10:00:00\",\"status\":400,\"error\":\"Bad Request\",\"message\":\"A review already exists for this booking\",\"path\":\"/api/v1/reviews\"}"
+            }
+          ]
+        },
+        {
+          "name": "Rating outside allowed range (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{memberApiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookingId\": 1,\n  \"rating\": 6,\n  \"comment\": \"Invalid rating.\"\n}"
+            }
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{memberApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/reviews"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"bookingId\": 1,\n  \"rating\": 6,\n  \"comment\": \"Invalid rating.\"\n}"
+                }
+              },
+              "status": "Error",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"timestamp\":\"2025-01-01T10:00:00\",\"status\":400,\"error\":\"Bad Request\",\"message\":\"A review already exists for this booking\",\"path\":\"/api/v1/reviews\"}"
+            }
+          ]
+        },
+        {
+          "name": "Edit another member's review (403)",
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "X-API-Key", "value": "{{otherMemberApiKey}}" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{otherMemberApiKey}}"
+              }
             ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews/{{reviewId}}"
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"rating\": 1,\n  \"comment\": \"Trying to edit someone else's review.\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/reviews/{{reviewId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "reviews", "{{reviewId}}"]
+              "raw": "{\n  \"rating\": 1,\n  \"comment\": \"Unauthorized.\"\n}"
             }
-          }
-        },
-        {
-          "name": "Delete own review (member, soft delete)",
-          "request": {
-            "method": "DELETE",
-            "header": [{ "key": "X-API-Key", "value": "{{memberApiKey}}" }],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/reviews/{{reviewId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "reviews", "{{reviewId}}"]
+          },
+          "response": [
+            {
+              "name": "Example response",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-API-Key",
+                    "value": "{{otherMemberApiKey}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/reviews/{{reviewId}}"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rating\": 1,\n  \"comment\": \"Unauthorized.\"\n}"
+                }
+              },
+              "status": "Error",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\"timestamp\":\"2025-01-01T10:00:00\",\"status\":403,\"error\":\"Forbidden\",\"message\":\"A review already exists for this booking\",\"path\":\"/api/v1/reviews\"}"
             }
-          }
-        },
-        {
-          "name": "Delete review - EDGE: deleting another member's review (expect 403)",
-          "request": {
-            "method": "DELETE",
-            "header": [{ "key": "X-API-Key", "value": "{{otherMemberApiKey}}" }],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/reviews/{{reviewId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "reviews", "{{reviewId}}"]
-            }
-          }
-        },
-        {
-          "name": "Delete any review as Admin",
-          "request": {
-            "method": "DELETE",
-            "header": [{ "key": "X-API-Key", "value": "{{adminApiKey}}" }],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/reviews/{{reviewId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "reviews", "{{reviewId}}"]
-            }
-          }
+          ]
         }
       ]
     }

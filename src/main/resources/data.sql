@@ -27,6 +27,16 @@ VALUES
     (5, 'Erin Member', 'erin.member@coworkhub.test', 'MEMBER', 'seed-member-key-5', NULL, 0.0, 'ACTIVE', false, now(), now())
 ON CONFLICT (id) DO NOTHING;
 
+-- API keys are stored as SHA-256 hashes, matching ApiKeyFilter authentication.
+INSERT INTO api_keys (key_hash, name, role, user_id, active, created_at)
+VALUES
+    ('5decb1285ff0a42a28b9190203c6b660400bbc878ed07b644b9429f277709421', 'Seed admin API key', 'ADMIN', 1, true, now()),
+    ('3f5b813cd5b57c91c5a8f1b501ca62d8be8e6ad7d41e875454342c071c320dea', 'Seed Bob member API key', 'MEMBER', 2, true, now()),
+    ('c40dbe8010d034b6938213eec18ccb9f38329fee88f910ecf445314adbe56d8f', 'Seed Carol member API key', 'MEMBER', 3, true, now()),
+    ('b43694edbb0c6e9bbdeb5bcee869b7291c950dd3b33c3dcfed34eb217346a271', 'Seed Dave member API key', 'MEMBER', 4, true, now()),
+    ('53eb93c7cfb619604ec0a840fb91d34e14635d3f300c8e2951804bc9f691133a', 'Seed Erin member API key', 'MEMBER', 5, true, now())
+ON CONFLICT (key_hash) DO NOTHING;
+
 -- Bookings (existing history)
 INSERT INTO bookings (id, user_id, space_id, start_time, end_time, status, cost_charged, credit_hours_used, created_at, updated_at)
 VALUES
