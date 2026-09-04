@@ -9,6 +9,7 @@ import com.example.app.entity.Space;
 import com.example.app.entity.User;
 import com.example.app.exception.BusinessRuleException;
 import com.example.app.repository.BookingRepository;
+import com.example.app.repository.ReviewRepository;
 import com.example.app.repository.SpaceRepository;
 import com.example.app.repository.UserRepository;
 import java.math.BigDecimal;
@@ -35,16 +36,19 @@ public class ReportService {
   private final BookingRepository bookingRepository;
   private final SpaceRepository spaceRepository;
   private final UserRepository userRepository;
+  private final ReviewRepository reviewRepository;
 
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 
   public ReportService(
       BookingRepository bookingRepository,
       SpaceRepository spaceRepository,
-      UserRepository userRepository) {
+      UserRepository userRepository,
+      ReviewRepository reviewRepository) {
     this.bookingRepository = bookingRepository;
     this.spaceRepository = spaceRepository;
     this.userRepository = userRepository;
+    this.reviewRepository = reviewRepository;
   }
 
   public List<SpaceUtilizationResponse> spaceUtilization(LocalDate weekStartDate) {
@@ -85,6 +89,8 @@ public class ReportService {
               response.setAvailableHours(availableHours);
               response.setUtilizationPercentage(
                   availableHours > 0 ? round((bookedHours / availableHours) * 100) : 0.0);
+              Double avgRating = reviewRepository.findAverageRatingBySpaceId(space.getId());
+              response.setAverageRating(avgRating != null ? roundToOneDecimal(avgRating) : null);
               return response;
             })
         .collect(Collectors.toList());
@@ -170,5 +176,9 @@ public class ReportService {
 
   private double round(double value) {
     return BigDecimal.valueOf(value).setScale(2, RoundingMode.HALF_UP).doubleValue();
+  }
+
+  private double roundToOneDecimal(double value) {
+    return BigDecimal.valueOf(value).setScale(1, RoundingMode.HALF_UP).doubleValue();
   }
 }

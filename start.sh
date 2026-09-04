@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-SERVER_PORT="${SERVER_PORT:-20330}"
+SERVER_PORT="${SERVER_PORT:-26986}"
 
 ./gradlew bootJar -q
 

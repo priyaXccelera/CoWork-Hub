@@ -12,6 +12,7 @@ public class ReportDtos {
     private double bookedHours;
     private double availableHours;
     private double utilizationPercentage;
+    private Double averageRating;
 
     public Long getSpaceId() {
       return spaceId;
@@ -59,6 +60,14 @@ public class ReportDtos {
 
     public void setUtilizationPercentage(double utilizationPercentage) {
       this.utilizationPercentage = utilizationPercentage;
+    }
+
+    public Double getAverageRating() {
+      return averageRating;
+    }
+
+    public void setAverageRating(Double averageRating) {
+      this.averageRating = averageRating;
     }
   }
 

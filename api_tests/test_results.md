@@ -57,6 +57,33 @@ No FAILED/SKIPPED endpoints were found — 0 fix iterations were required.
 | 49 | GET | /api-docs | OpenAPI JSON | 200 | PASSED |
 | 50 | GET | /actuator/health | Health check | 200 | PASSED |
 
+## Iteration 1 — Reviews feature
+
+Base URL: `http://localhost:26986`
+
+| # | Method | Endpoint | Test | Status Code | Result |
+|---|---|---|---|---|---|
+| 51 | GET | /api/v1/spaces | List includes averageRating/totalReviews | 200 | PASSED |
+| 52 | GET | /api/v1/spaces/{id} | Get single space includes averageRating/totalReviews | 200 | PASSED |
+| 53 | GET | /api/v1/reports/space-utilization | Includes averageRating per space (Admin) | 200 | PASSED |
+| 54 | POST | /api/v1/reviews | Create review, own COMPLETED booking, no existing review | 201 | PASSED |
+| 55 | POST | /api/v1/reviews | Duplicate review on same booking (expect 409) | 409 | PASSED |
+| 56 | POST | /api/v1/reviews | Rating out of range, 7 (expect 400) | 400 | PASSED |
+| 57 | POST | /api/v1/reviews | Rating out of range, 0 (expect 400) | 400 | PASSED |
+| 58 | POST | /api/v1/reviews | Comment > 500 chars (expect 400) | 400 | PASSED |
+| 59 | POST | /api/v1/reviews | Booking not COMPLETED (expect 400) | 400 | PASSED |
+| 60 | POST | /api/v1/reviews | Someone else's booking (expect 403) | 403 | PASSED |
+| 61 | GET | /api/v1/reviews?spaceId={id} | List reviews for a space, paginated, createdAt desc | 200 | PASSED |
+| 62 | GET | /api/v1/reviews/{id} | Get single review | 200 | PASSED |
+| 63 | PUT | /api/v1/reviews/{id} | Edit own review (Member) | 200 | PASSED |
+| 64 | PUT | /api/v1/reviews/{id} | Edit another member's review (expect 403) | 403 | PASSED |
+| 65 | DELETE | /api/v1/reviews/{id} | Delete another member's review (expect 403) | 403 | PASSED |
+| 66 | DELETE | /api/v1/reviews/{id} | Delete own review (Member, soft delete) | 204 | PASSED |
+| 67 | GET | /api/v1/reviews/{id} | Get soft-deleted review (expect 404) | 404 | PASSED |
+| 68 | DELETE | /api/v1/reviews/{id} | Admin deletes another user's review | 204 | PASSED |
+| 69 | GET | /api/v1/reviews?spaceId={id} | No API key (expect 401/403) | 401 | PASSED |
+| 70 | GET | /api-docs | OpenAPI JSON includes /api/v1/reviews paths | 200 | PASSED |
+
 ## Notes
 - All IDs created during testing (test spaces, plans, users, bookings, API keys)
   were deleted/cancelled/revoked before generating the final report; seed data
@@ -65,3 +92,10 @@ No FAILED/SKIPPED endpoints were found — 0 fix iterations were required.
   cost calculation (credit-hour deduction + overage), free vs. late cancellation
   fee (25%), and waitlist auto-promotion on cancellation.
 - 0 iterations of the fix loop were required — baseline run passed all endpoints.
+- Iteration 1 (Reviews feature) required one fix before endpoints could be tested at
+  all: a pre-existing bug caused the app to fail to boot with "Circular depends-on
+  relationship between 'flyway' and 'entityManagerFactory'". Root-caused to
+  `spring.jpa.defer-datasource-initialization=true` combined with a custom
+  `@Component` security `Filter` bean; fixed by removing that property and marking
+  the filter's JPA repository dependencies `@Lazy` (see `ai_changes.md`). All 20
+  Reviews-related tests above passed after the fix, with 0 further iterations.

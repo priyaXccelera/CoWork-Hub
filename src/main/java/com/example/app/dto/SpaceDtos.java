@@ -79,6 +79,8 @@ public class SpaceDtos {
     private boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Double averageRating;
+    private long totalReviews;
 
     public Long getId() {
       return id;
@@ -142,6 +144,22 @@ public class SpaceDtos {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
       this.updatedAt = updatedAt;
+    }
+
+    public Double getAverageRating() {
+      return averageRating;
+    }
+
+    public void setAverageRating(Double averageRating) {
+      this.averageRating = averageRating;
+    }
+
+    public long getTotalReviews() {
+      return totalReviews;
+    }
+
+    public void setTotalReviews(long totalReviews) {
+      this.totalReviews = totalReviews;
     }
   }
 }

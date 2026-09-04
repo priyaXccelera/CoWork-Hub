@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,7 +31,18 @@ public class ApiKeyFilter extends OncePerRequestFilter {
   private final ApiKeyRepository apiKeyRepository;
   private final UserRepository userRepository;
 
-  public ApiKeyFilter(ApiKeyRepository apiKeyRepository, UserRepository userRepository) {
+  /**
+   * The repositories are injected lazily (proxied, not resolved eagerly) because Spring Boot's
+   * {@code ServletContextInitializerBeans} scans for all {@code Filter} beans -- including this
+   * one, since it implements {@link jakarta.servlet.Filter} via {@link OncePerRequestFilter} --
+   * during Tomcat context startup, which happens before the normal singleton pre-instantiation
+   * order that guarantees Flyway migrations run before the JPA {@code entityManagerFactory} is
+   * created. Without {@code @Lazy}, that early filter lookup would force-create the JPA
+   * repositories (and therefore entityManagerFactory) ahead of Flyway, tripping Spring's
+   * "Circular depends-on relationship between 'flyway' and 'entityManagerFactory'" startup guard.
+   */
+  public ApiKeyFilter(
+      @Lazy ApiKeyRepository apiKeyRepository, @Lazy UserRepository userRepository) {
     this.apiKeyRepository = apiKeyRepository;
     this.userRepository = userRepository;
   }

@@ -1,0 +1,292 @@
+{
+  "info": {
+    "name": "CoWork Hub API",
+    "description": "CoWork Hub backend collection, including the Reviews feature (create/list/get/edit/delete) and its business-rule edge cases.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:26986" },
+    { "key": "adminKey", "value": "local-dev-admin-key-change-me" },
+    { "key": "adminApiKey", "value": "seed-admin-key-1" },
+    { "key": "memberApiKey", "value": "seed-member-key-2" },
+    { "key": "otherMemberApiKey", "value": "seed-member-key-3" },
+    { "key": "spaceId", "value": "1" },
+    { "key": "completedBookingId", "value": "1" },
+    { "key": "confirmedBookingId", "value": "4" },
+    { "key": "reviewId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Spaces",
+      "item": [
+        {
+          "name": "List spaces (includes averageRating/totalReviews)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-API-Key", "value": "{{memberApiKey}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/spaces?offset=0&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "spaces"],
+              "query": [
+                { "key": "offset", "value": "0" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get space by id (includes averageRating/totalReviews)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-API-Key", "value": "{{memberApiKey}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/spaces/{{spaceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "spaces", "{{spaceId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Space utilization (includes averageRating)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-API-Key", "value": "{{adminApiKey}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reports/space-utilization",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reports", "space-utilization"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Create review - happy path (member, completed booking)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-API-Key", "value": "{{memberApiKey}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookingId\": {{completedBookingId}},\n  \"rating\": 5,\n  \"comment\": \"Great space, would book again.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reviews"]
+            }
+          }
+        },
+        {
+          "name": "Create review - EDGE: duplicate review on same booking (expect 409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-API-Key", "value": "{{memberApiKey}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookingId\": {{completedBookingId}},\n  \"rating\": 4,\n  \"comment\": \"Trying to review the same booking twice.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reviews"]
+            }
+          }
+        },
+        {
+          "name": "Create review - EDGE: booking not COMPLETED (expect 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-API-Key", "value": "{{memberApiKey}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookingId\": {{confirmedBookingId}},\n  \"rating\": 4,\n  \"comment\": \"Booking is still CONFIRMED, not COMPLETED.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reviews"]
+            }
+          }
+        },
+        {
+          "name": "Create review - EDGE: rating out of range (expect 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-API-Key", "value": "{{memberApiKey}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookingId\": {{completedBookingId}},\n  \"rating\": 7,\n  \"comment\": \"Rating is out of the allowed 1-5 range.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reviews"]
+            }
+          }
+        },
+        {
+          "name": "Create review - EDGE: comment exceeds 500 chars (expect 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-API-Key", "value": "{{memberApiKey}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookingId\": {{completedBookingId}},\n  \"rating\": 3,\n  \"comment\": \"REPLACE_WITH_501_CHAR_STRING\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reviews"]
+            }
+          }
+        },
+        {
+          "name": "Create review - EDGE: someone else's booking (expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-API-Key", "value": "{{otherMemberApiKey}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookingId\": {{completedBookingId}},\n  \"rating\": 3,\n  \"comment\": \"This booking does not belong to me.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reviews"]
+            }
+          }
+        },
+        {
+          "name": "List reviews for a space (paginated, newest first)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-API-Key", "value": "{{memberApiKey}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews?spaceId={{spaceId}}&offset=0&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reviews"],
+              "query": [
+                { "key": "spaceId", "value": "{{spaceId}}" },
+                { "key": "offset", "value": "0" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get single review",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-API-Key", "value": "{{memberApiKey}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews/{{reviewId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reviews", "{{reviewId}}"]
+            }
+          }
+        },
+        {
+          "name": "Edit own review",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-API-Key", "value": "{{memberApiKey}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 4,\n  \"comment\": \"Updated my review after a second visit.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews/{{reviewId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reviews", "{{reviewId}}"]
+            }
+          }
+        },
+        {
+          "name": "Edit review - EDGE: editing another member's review (expect 403)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-API-Key", "value": "{{otherMemberApiKey}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 1,\n  \"comment\": \"Trying to edit someone else's review.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews/{{reviewId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reviews", "{{reviewId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete own review (member, soft delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "X-API-Key", "value": "{{memberApiKey}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews/{{reviewId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reviews", "{{reviewId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete review - EDGE: deleting another member's review (expect 403)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "X-API-Key", "value": "{{otherMemberApiKey}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews/{{reviewId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reviews", "{{reviewId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete any review as Admin",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "X-API-Key", "value": "{{adminApiKey}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reviews/{{reviewId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reviews", "{{reviewId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

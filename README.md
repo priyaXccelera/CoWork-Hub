@@ -21,7 +21,7 @@ Layered architecture: `Controller -> Service -> Repository -> Entity/DTO`.
 src/main/java/com/example/app/
   AppApplication.java        Spring Boot entry point (+ @EnableJpaAuditing, @EnableScheduling)
   config/                    SecurityConfig, CorsConfig
-  entity/                    JPA entities (User, MembershipPlan, Space, Booking, Waitlist, Invoice, enums)
+  entity/                    JPA entities (User, MembershipPlan, Space, Booking, Waitlist, Invoice, Review, enums)
   repository/                Spring Data JPA repositories + Specifications
   service/                   Business logic (booking engine, invoicing, reporting, ...)
   scheduler/                 BookingCompletionScheduler (auto-completes past bookings)
@@ -103,6 +103,15 @@ Raw API keys are only ever returned once, at creation time (`POST /users` or
    also immediately revokes all of their API keys.
 8. **Auto-completion** — a background job runs every minute and transitions
    `CONFIRMED` bookings whose `endTime` has passed into `COMPLETED`.
+9. **Reviews** — a member can only review a space if they have a booking for that
+   space with status `COMPLETED`; at most one review is allowed per booking
+   (multiple reviews of the same space are fine as long as they come from
+   different completed bookings). `rating` must be between 1 and 5 (inclusive);
+   `comment` is optional but capped at 500 characters. A member may edit or
+   delete only their own review; an Admin may delete any review. Reviews are
+   soft-deleted, never hard-deleted. `GET /spaces` and `GET /spaces/{id}` (and
+   the space-utilization report) include `averageRating` (rounded to 1 decimal)
+   and `totalReviews`, computed from non-deleted reviews.
 
 ## API Overview (prefix `/api/v1`)
 
@@ -127,6 +136,11 @@ Raw API keys are only ever returned once, at creation time (`POST /users` or
 | GET | /reports/space-utilization | ADMIN | `%` per space per week (capacity-aware) |
 | GET | /reports/revenue | ADMIN | `?month=YYYY-MM` |
 | GET | /reports/top-members | ADMIN | `?limit=5` (max 100) |
+| POST | /reviews | authenticated (own bookings only) | requires a COMPLETED booking; one review per booking |
+| GET | /reviews?spaceId={id} | any authenticated | paginated, sorted by `createdAt desc` by default |
+| GET | /reviews/{id} | any authenticated | |
+| PUT | /reviews/{id} | owning member only | edit own review |
+| DELETE | /reviews/{id} | owning member or ADMIN | soft delete |
 | GET | /actuator/health | public | health check |
 | GET | /docs | public | Swagger UI |
 | GET | /api-docs | public | OpenAPI JSON |
@@ -153,7 +167,7 @@ optional `details`) with the correct HTTP status code:
 `src/main/resources/application.properties`:
 
 ```
-server.port=20330
+server.port=26986
 spring.datasource.url=jdbc:postgresql://localhost:5432/gen_4d326c90fe72
 spring.datasource.username=myuser
 spring.datasource.password=mypassword
@@ -164,7 +178,7 @@ app.cors.allowed-origins=${APP_CORS_ALLOWED_ORIGINS:http://localhost:3000,http:/
 
 Environment variable overrides used by `start.sh`/`start.bat`:
 
-- `SERVER_PORT` (defaults to `20330`)
+- `SERVER_PORT` (defaults to `26986`)
 - `ADMIN_API_KEY` — **must** be set to a strong, secret value in any real
   deployment. It is not committed to source control; the value in
   `application.properties` is only a local-dev placeholder. It gates
@@ -181,13 +195,14 @@ export ADMIN_API_KEY="$(openssl rand -hex 32)"   # required in any non-local env
 ./start.sh
 ```
 
-The app starts on `http://localhost:20330`. Swagger UI: `http://localhost:20330/docs`.
+The app starts on `http://localhost:26986`. Swagger UI: `http://localhost:26986/docs`.
 
 ### Database & Migrations
 
 The schema is version-controlled with **Flyway** migrations under
-`src/main/resources/db/migration` (`V1__baseline.sql`, `V2__original_cost_and_foreign_keys.sql`).
-Hibernate is configured with `ddl-auto=validate` and never mutates the schema itself.
+`src/main/resources/db/migration` (`V1__baseline.sql`, `V2__original_cost_and_foreign_keys.sql`,
+`V3__reviews.sql`). Hibernate is configured with `ddl-auto=validate` and never mutates the
+schema itself.
 
 - Migrations run automatically on application startup.
 - On a brand-new empty database, Flyway creates the full schema from `V1` onward.
@@ -197,26 +212,34 @@ Hibernate is configured with `ddl-auto=validate` and never mutates the schema it
 - To run migrations manually without starting the app: `./gradlew flywayMigrate` (requires the
   `spring.datasource.*` properties, e.g. via `-Dflyway.url=... -Dflyway.user=... -Dflyway.password=...`
   or by relying on the values in `application.properties`).
-- Seed data lives in `src/main/resources/data.sql` (3 membership plans, 6 spaces, 5 users, 5
-  historical bookings) and is applied after migrations on every startup (idempotent, uses
-  `ON CONFLICT DO NOTHING`).
+- Seed data lives in `src/main/resources/data.sql` (3 membership plans, 6 spaces, 5 users, 10
+  historical bookings and 7 sample reviews) and is applied after migrations on every startup
+  (idempotent, uses `ON CONFLICT DO NOTHING`).
 
 ## Example Usage
 
 ```bash
 # 1. Mint an admin API key (replace <ADMIN_KEY> with your ADMIN_API_KEY env value)
-curl -X POST http://localhost:20330/api/v1/api-keys \
+curl -X POST http://localhost:26986/api/v1/api-keys \
   -H "Content-Type: application/json" \
   -H "X-Admin-Key: <ADMIN_KEY>" \
   -d '{"name":"admin-test","role":"ADMIN"}'
 
 # 2. Use the returned "apiKey" value as X-API-Key for all business endpoints
-curl http://localhost:20330/api/v1/spaces -H "X-API-Key: <RAW_KEY>"
+curl http://localhost:26986/api/v1/spaces -H "X-API-Key: <RAW_KEY>"
 
 # 3. If a space is fully booked, POST /bookings returns 409; join the waitlist instead
-curl -X POST http://localhost:20330/api/v1/waitlist \
+curl -X POST http://localhost:26986/api/v1/waitlist \
   -H "Content-Type: application/json" -H "X-API-Key: <RAW_KEY>" \
   -d '{"spaceId":1,"requestedStart":"2025-01-01T09:00:00","requestedEnd":"2025-01-01T11:00:00"}'
+
+# 4. Leave a review for one of your own COMPLETED bookings
+curl -X POST http://localhost:26986/api/v1/reviews \
+  -H "Content-Type: application/json" -H "X-API-Key: <RAW_KEY>" \
+  -d '{"bookingId":1,"rating":5,"comment":"Great space!"}'
+
+# 5. List reviews for a space (paginated, newest first by default)
+curl "http://localhost:26986/api/v1/reviews?spaceId=1&offset=0&limit=20" -H "X-API-Key: <RAW_KEY>"
 ```
 
 ## Tests
@@ -227,3 +250,10 @@ the booking's original value rather than just its cash cost) and pagination limi
 
 API endpoints were additionally exercised end-to-end with `curl` (see `/api_tests/test_results.md`
 for the full pass/fail matrix) and summarized in `api_test_report.xlsx`.
+
+## Postman Collection
+
+A ready-to-import Postman collection is provided at `postman/CoWork-Hub.postman_collection.json`,
+covering every endpoint including Reviews, and edge cases such as: duplicate review on the same
+booking (409), reviewing a booking that isn't `COMPLETED` (400), rating out of the 1-5 range (400),
+and editing/deleting another member's review (403).
