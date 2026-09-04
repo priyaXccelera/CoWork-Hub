@@ -101,4 +101,4 @@ Pagination uses `offset` and `limit` (default 20, maximum 100). Review ratings a
 
 ## Postman Collection
 
-Import `postman/CoWork-Hub.postman_collection.json`. It covers every API operation and contains saved example responses, including review validation/authorization edge cases.
+Import `postman/CoWork-Hub.postman_collection.json`. It covers every API operation and contains saved example responses, including review and notification validation/authorization edge cases, notification pagination, and unread-count checks.
