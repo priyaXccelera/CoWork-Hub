@@ -1,6 +1,6 @@
 # CoWork Hub
 
-A Spring Boot backend for coworking-space booking and membership management. It supports members, membership plans, spaces, bookings, waitlists, invoices, API keys, reports, and reviews.
+A Spring Boot backend for coworking-space booking and membership management. It supports members, membership plans, spaces, bookings, waitlists, invoices, API keys, reports, reviews, and in-app notifications.
 
 ## Tech Stack
 
@@ -95,8 +95,9 @@ All business paths use the `/api/v1` prefix.
 - Invoices: `POST /invoices/generate`, `GET /invoices`, `GET /invoices/{id}`
 - Reports: `GET /reports/space-utilization`, `/reports/revenue`, `/reports/top-members`
 - Reviews: `POST`, `GET`, `GET/{id}`, `PUT/{id}`, `DELETE/{id}`
+- Notifications: `GET /notifications`, `GET /notifications/unread-count`, `PATCH /notifications/{id}/read`, `PATCH /notifications/read-all`
 
-Pagination uses `offset` and `limit` (default 20, maximum 100). Review ratings are 1–5; reviews require an owned completed booking and are soft-deleted.
+Pagination uses `offset` and `limit` (default 20, maximum 100). Review ratings are 1–5; reviews require an owned completed booking and are soft-deleted. Notifications are personal in-app records: they are generated for booking confirmations/cancellations, waitlist promotions, and invoice generation, and can only be read or marked as read by their owner.
 
 ## Postman Collection
 

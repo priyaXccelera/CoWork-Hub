@@ -5,6 +5,7 @@ import com.coworkhub.api.dto.InvoiceDtos.InvoiceResponse;
 import com.coworkhub.api.entity.Booking;
 import com.coworkhub.api.entity.BookingStatus;
 import com.coworkhub.api.entity.Invoice;
+import com.coworkhub.api.entity.NotificationType;
 import com.coworkhub.api.exception.BusinessRuleException;
 import com.coworkhub.api.exception.ForbiddenException;
 import com.coworkhub.api.exception.ResourceNotFoundException;
@@ -33,14 +34,17 @@ public class InvoiceService {
   private final InvoiceRepository invoiceRepository;
   private final BookingRepository bookingRepository;
   private final UserRepository userRepository;
+  private final NotificationService notificationService;
 
   public InvoiceService(
       InvoiceRepository invoiceRepository,
       BookingRepository bookingRepository,
-      UserRepository userRepository) {
+      UserRepository userRepository,
+      NotificationService notificationService) {
     this.invoiceRepository = invoiceRepository;
     this.bookingRepository = bookingRepository;
     this.userRepository = userRepository;
+    this.notificationService = notificationService;
   }
 
   public InvoiceResponse generate(InvoiceGenerateRequest request) {
@@ -85,6 +89,13 @@ public class InvoiceService {
     invoice.setTotalCreditOverageCharged(overageCharges.setScale(2, RoundingMode.HALF_UP));
 
     Invoice saved = invoiceRepository.save(invoice);
+    notificationService.createSafely(
+        saved.getUserId(),
+        NotificationType.INVOICE_GENERATED,
+        "Monthly invoice generated",
+        "Your invoice for " + saved.getMonth() + " has been generated.",
+        "INVOICE",
+        saved.getId());
     return toResponse(saved);
   }
 

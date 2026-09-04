@@ -77,6 +77,19 @@ VALUES
     (7, 4, 3, 500005, 5, 'Second time booking this room, still great!', false, now() - interval '8 days', now() - interval '8 days')
 ON CONFLICT (id) DO NOTHING;
 
+-- In-app notification log sample data: a mix of read and unread notifications across users and trigger types.
+INSERT INTO notifications (id, user_id, type, title, message, reference_type, reference_id, is_read, created_at)
+VALUES
+    (1, 2, 'BOOKING_CONFIRMED', 'Booking confirmed', 'Your booking for Hot Desk A1 has been confirmed.', 'BOOKING', 4, false, now() - interval '1 day'),
+    (2, 2, 'INVOICE_GENERATED', 'Monthly invoice generated', 'Your invoice for the current month has been generated.', 'INVOICE', 1, true, now() - interval '2 days'),
+    (3, 3, 'BOOKING_CONFIRMED', 'Booking confirmed', 'Your booking for Private Cabin 2 has been confirmed.', 'BOOKING', 5, false, now() - interval '3 hours'),
+    (4, 3, 'WAITLIST_PROMOTED', 'Waitlist booking confirmed', 'A space is available and your waitlisted booking has been confirmed.', 'BOOKING', 2, true, now() - interval '4 days'),
+    (5, 4, 'BOOKING_CANCELLED', 'Booking cancelled', 'Your booking has been cancelled.', 'BOOKING', 3, false, now() - interval '2 days'),
+    (6, 4, 'INVOICE_GENERATED', 'Monthly invoice generated', 'Your invoice for the current month has been generated.', 'INVOICE', 2, true, now() - interval '6 days'),
+    (7, 5, 'WAITLIST_PROMOTED', 'Waitlist booking confirmed', 'A space is available and your waitlisted booking has been confirmed.', 'BOOKING', 500002, false, now() - interval '5 days'),
+    (8, 5, 'BOOKING_CONFIRMED', 'Booking confirmed', 'Your booking for Meeting Room Eagle has been confirmed.', 'BOOKING', 500002, true, now() - interval '7 days')
+ON CONFLICT (id) DO NOTHING;
+
 -- Keep identity sequences in sync with the explicit ids inserted above
 SELECT setval(pg_get_serial_sequence('membership_plans', 'id'), COALESCE((SELECT MAX(id) FROM membership_plans), 1));
 SELECT setval(pg_get_serial_sequence('spaces', 'id'), COALESCE((SELECT MAX(id) FROM spaces), 1));
@@ -84,3 +97,4 @@ SELECT setval(pg_get_serial_sequence('users', 'id'), COALESCE((SELECT MAX(id) FR
 -- Bookings intentionally excluded from the sequence bump: organically-created bookings (ids well
 -- below 500000) should keep incrementing normally rather than jumping past the high seed range.
 SELECT setval(pg_get_serial_sequence('reviews', 'id'), COALESCE((SELECT MAX(id) FROM reviews), 1));
+SELECT setval(pg_get_serial_sequence('notifications', 'id'), COALESCE((SELECT MAX(id) FROM notifications), 1));

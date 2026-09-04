@@ -5,6 +5,7 @@ import com.coworkhub.api.dto.BookingDtos.BookingResponse;
 import com.coworkhub.api.entity.Booking;
 import com.coworkhub.api.entity.BookingStatus;
 import com.coworkhub.api.entity.MembershipPlan;
+import com.coworkhub.api.entity.NotificationType;
 import com.coworkhub.api.entity.Space;
 import com.coworkhub.api.entity.SpaceType;
 import com.coworkhub.api.entity.User;
@@ -41,16 +42,19 @@ public class BookingService {
   private final SpaceRepository spaceRepository;
   private final UserRepository userRepository;
   private final WaitlistRepository waitlistRepository;
+  private final NotificationService notificationService;
 
   public BookingService(
       BookingRepository bookingRepository,
       SpaceRepository spaceRepository,
       UserRepository userRepository,
-      WaitlistRepository waitlistRepository) {
+      WaitlistRepository waitlistRepository,
+      NotificationService notificationService) {
     this.bookingRepository = bookingRepository;
     this.spaceRepository = spaceRepository;
     this.userRepository = userRepository;
     this.waitlistRepository = waitlistRepository;
+    this.notificationService = notificationService;
   }
 
   @Transactional
@@ -115,6 +119,13 @@ public class BookingService {
     booking.setCreditHoursUsed(costResult.creditHoursUsed);
 
     Booking saved = bookingRepository.save(booking);
+    notificationService.createSafely(
+        saved.getUserId(),
+        NotificationType.BOOKING_CONFIRMED,
+        "Booking confirmed",
+        "Your booking for " + space.getName() + " has been confirmed.",
+        "BOOKING",
+        saved.getId());
     return toResponse(saved);
   }
 
@@ -168,6 +179,13 @@ public class BookingService {
     if (booking.getStatus() == BookingStatus.WAITLISTED) {
       booking.setStatus(BookingStatus.CANCELLED);
       bookingRepository.save(booking);
+      notificationService.createSafely(
+          booking.getUserId(),
+          NotificationType.BOOKING_CANCELLED,
+          "Booking cancelled",
+          "Your waitlisted booking has been cancelled.",
+          "BOOKING",
+          booking.getId());
 
       waitlistRepository
           .findBySpaceIdAndStatusOrderByCreatedAtAsc(booking.getSpaceId(), WaitlistStatus.WAITING)
@@ -213,6 +231,13 @@ public class BookingService {
     booking.setStatus(BookingStatus.CANCELLED);
     Booking saved = bookingRepository.save(booking);
 
+    notificationService.createSafely(
+        saved.getUserId(),
+        NotificationType.BOOKING_CANCELLED,
+        "Booking cancelled",
+        "Your booking has been cancelled.",
+        "BOOKING",
+        saved.getId());
     promoteWaitlistForSpace(booking.getSpaceId());
 
     return toResponse(saved);
@@ -279,7 +304,14 @@ public class BookingService {
       targetBooking.setCostCharged(costResult.cost);
       targetBooking.setOriginalCost(originalCost);
       targetBooking.setCreditHoursUsed(costResult.creditHoursUsed);
-      bookingRepository.save(targetBooking);
+      Booking promotedBooking = bookingRepository.save(targetBooking);
+      notificationService.createSafely(
+          promotedBooking.getUserId(),
+          NotificationType.WAITLIST_PROMOTED,
+          "Waitlist booking confirmed",
+          "A space is available and your waitlisted booking has been confirmed.",
+          "BOOKING",
+          promotedBooking.getId());
 
       waitlist.setStatus(WaitlistStatus.PROMOTED);
       waitlist.setBookingId(targetBooking.getId());
