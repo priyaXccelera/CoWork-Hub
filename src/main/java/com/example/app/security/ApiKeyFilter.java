@@ -38,8 +38,8 @@ public class ApiKeyFilter extends OncePerRequestFilter {
    * during Tomcat context startup, which happens before the normal singleton pre-instantiation
    * order that guarantees Flyway migrations run before the JPA {@code entityManagerFactory} is
    * created. Without {@code @Lazy}, that early filter lookup would force-create the JPA
-   * repositories (and therefore entityManagerFactory) ahead of Flyway, tripping Spring's
-   * "Circular depends-on relationship between 'flyway' and 'entityManagerFactory'" startup guard.
+   * repositories (and therefore entityManagerFactory) ahead of Flyway, tripping Spring's "Circular
+   * depends-on relationship between 'flyway' and 'entityManagerFactory'" startup guard.
    */
   public ApiKeyFilter(
       @Lazy ApiKeyRepository apiKeyRepository, @Lazy UserRepository userRepository) {

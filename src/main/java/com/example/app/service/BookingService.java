@@ -220,9 +220,9 @@ public class BookingService {
 
   /**
    * Attempts to promote every WAITING waitlist entry for the given space, in first-come-first
-   * served (createdAt) order. Each candidate is evaluated independently against the space's
-   * current capacity: a candidate whose requested slot still conflicts is skipped (left WAITING)
-   * without blocking promotion of later candidates whose slot may already be free.
+   * served (createdAt) order. Each candidate is evaluated independently against the space's current
+   * capacity: a candidate whose requested slot still conflicts is skipped (left WAITING) without
+   * blocking promotion of later candidates whose slot may already be free.
    */
   private void promoteWaitlistForSpace(Long spaceId) {
     List<Waitlist> waitingEntries =

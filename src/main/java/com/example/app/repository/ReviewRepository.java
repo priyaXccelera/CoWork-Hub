@@ -18,8 +18,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
   boolean existsByBookingIdAndDeletedFalse(Long bookingId);
 
   /** Used by the space-utilization report and the space read endpoints to show average rating. */
-  @Query(
-      "select avg(r.rating) from Review r where r.spaceId = :spaceId and r.deleted = false")
+  @Query("select avg(r.rating) from Review r where r.spaceId = :spaceId and r.deleted = false")
   Double findAverageRatingBySpaceId(@Param("spaceId") Long spaceId);
 
   @Query("select count(r) from Review r where r.spaceId = :spaceId and r.deleted = false")

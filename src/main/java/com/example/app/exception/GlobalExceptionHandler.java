@@ -231,8 +231,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(DataIntegrityViolationException.class)
   public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
       DataIntegrityViolationException ex, HttpServletRequest request) {
-    log.warn(
-        "Data integrity violation on {} {}", request.getMethod(), request.getRequestURI(), ex);
+    log.warn("Data integrity violation on {} {}", request.getMethod(), request.getRequestURI(), ex);
     ErrorResponse error =
         new ErrorResponse(
             LocalDateTime.now(),

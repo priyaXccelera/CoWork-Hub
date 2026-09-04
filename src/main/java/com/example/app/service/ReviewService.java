@@ -30,9 +30,9 @@ public class ReviewService {
   }
 
   /**
-   * Creates a review for the booking supplied in the request. The space is always derived from
-   * the booking itself (never trusted from the caller) so a review can never be attached to a
-   * space the booking doesn't actually belong to.
+   * Creates a review for the booking supplied in the request. The space is always derived from the
+   * booking itself (never trusted from the caller) so a review can never be attached to a space the
+   * booking doesn't actually belong to.
    */
   public ReviewResponse create(ReviewRequest request, Long actorUserId) {
     Booking booking =
@@ -53,8 +53,7 @@ public class ReviewService {
     }
 
     if (reviewRepository.existsByBookingIdAndDeletedFalse(booking.getId())) {
-      throw new ConflictException(
-          "A review already exists for booking id: " + booking.getId());
+      throw new ConflictException("A review already exists for booking id: " + booking.getId());
     }
 
     Review review = new Review();

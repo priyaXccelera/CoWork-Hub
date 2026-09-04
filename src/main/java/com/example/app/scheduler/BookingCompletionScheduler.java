@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Periodically transitions CONFIRMED bookings whose endTime has already passed into COMPLETED,
- * so that reporting (utilization, revenue, top members) and invoicing reflect reality.
+ * Periodically transitions CONFIRMED bookings whose endTime has already passed into COMPLETED, so
+ * that reporting (utilization, revenue, top members) and invoicing reflect reality.
  */
 @Component
 public class BookingCompletionScheduler {

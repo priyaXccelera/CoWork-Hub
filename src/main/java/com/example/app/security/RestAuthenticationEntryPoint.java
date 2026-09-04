@@ -13,8 +13,8 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 /**
- * Ensures that any request which fails authentication (missing, invalid, blank or revoked API
- * key) receives a structured HTTP 401 response instead of Spring Security's default 403.
+ * Ensures that any request which fails authentication (missing, invalid, blank or revoked API key)
+ * receives a structured HTTP 401 response instead of Spring Security's default 403.
  */
 @Component
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {

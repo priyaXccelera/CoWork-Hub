@@ -61,7 +61,8 @@ public class ReviewController {
       @RequestParam(defaultValue = "20") int limit) {
     return ResponseEntity.ok(
         reviewService.listBySpace(
-            spaceId, OffsetPageRequest.of(offset, limit, Sort.by(Sort.Direction.DESC, "createdAt"))));
+            spaceId,
+            OffsetPageRequest.of(offset, limit, Sort.by(Sort.Direction.DESC, "createdAt"))));
   }
 
   @GetMapping("/{id}")

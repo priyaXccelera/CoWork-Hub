@@ -44,8 +44,8 @@ public class WaitlistService {
   /**
    * Explicitly joins the waitlist for a space/time-slot (typically called by a Member after
    * receiving a 409 Conflict from POST /bookings because the space is fully booked). Creates a
-   * placeholder WAITLISTED booking plus a linked waitlist entry; the placeholder is later
-   * promoted to CONFIRMED automatically when capacity frees up.
+   * placeholder WAITLISTED booking plus a linked waitlist entry; the placeholder is later promoted
+   * to CONFIRMED automatically when capacity frees up.
    */
   public WaitlistResponse join(WaitlistJoinRequest request, Long actorUserId, boolean isAdmin) {
     Long effectiveUserId =

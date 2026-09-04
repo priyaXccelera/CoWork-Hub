@@ -13,8 +13,8 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 /**
- * Ensures that an authenticated actor who lacks the required role/permission receives a
- * structured HTTP 403 response.
+ * Ensures that an authenticated actor who lacks the required role/permission receives a structured
+ * HTTP 403 response.
  */
 @Component
 public class RestAccessDeniedHandler implements AccessDeniedHandler {
