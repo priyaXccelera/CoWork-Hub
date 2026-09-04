@@ -1,5 +1,8 @@
 package com.example.app.security;
 
+import com.example.app.entity.User;
+import com.example.app.entity.UserStatus;
+import com.example.app.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,9 +28,11 @@ public class ApiKeyFilter extends OncePerRequestFilter {
   private static final String HEADER_NAME = "X-API-Key";
 
   private final ApiKeyRepository apiKeyRepository;
+  private final UserRepository userRepository;
 
-  public ApiKeyFilter(ApiKeyRepository apiKeyRepository) {
+  public ApiKeyFilter(ApiKeyRepository apiKeyRepository, UserRepository userRepository) {
     this.apiKeyRepository = apiKeyRepository;
+    this.userRepository = userRepository;
   }
 
   @Override
@@ -41,7 +46,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
       String hashed = hash(rawKey);
       Optional<ApiKey> found = apiKeyRepository.findByKeyHash(hashed);
 
-      if (found.isPresent() && found.get().isActive()) {
+      if (found.isPresent() && found.get().isActive() && isUsable(found.get())) {
         ApiKey apiKey = found.get();
         apiKey.setLastUsedAt(LocalDateTime.now());
         apiKeyRepository.save(apiKey);
@@ -60,6 +65,18 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     }
 
     filterChain.doFilter(request, response);
+  }
+
+  /**
+   * An API key tied to a user must not authenticate once that user has been soft-deleted or
+   * deactivated, even if the key row itself is still marked active.
+   */
+  private boolean isUsable(ApiKey apiKey) {
+    if (apiKey.getUserId() == null) {
+      return true;
+    }
+    Optional<User> user = userRepository.findByIdAndDeletedFalse(apiKey.getUserId());
+    return user.isPresent() && user.get().getStatus() == UserStatus.ACTIVE;
   }
 
   private String hash(String value) {

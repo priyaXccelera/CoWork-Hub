@@ -6,16 +6,22 @@ import org.springframework.data.domain.Sort;
 
 public class OffsetPageRequest implements Pageable, Serializable {
 
+  /** Maximum page size accepted across all list endpoints, to avoid unbounded result sets. */
+  public static final int MAX_LIMIT = 100;
+
   private final int offset;
   private final int limit;
   private final Sort sort;
 
   public OffsetPageRequest(int offset, int limit, Sort sort) {
     if (offset < 0) {
-      throw new IllegalArgumentException("Offset must not be less than zero");
+      throw new IllegalArgumentException("offset must not be less than zero");
     }
     if (limit < 1) {
-      throw new IllegalArgumentException("Limit must not be less than one");
+      throw new IllegalArgumentException("limit must not be less than one");
+    }
+    if (limit > MAX_LIMIT) {
+      throw new IllegalArgumentException("limit must not exceed " + MAX_LIMIT);
     }
     this.offset = offset;
     this.limit = limit;

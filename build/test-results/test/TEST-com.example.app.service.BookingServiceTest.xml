@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.app.service.BookingServiceTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-09-04T09:28:38" hostname="apix-dev" time="1.404">
+  <properties/>
+  <testcase name="createBooking_allowsBookingWhenUnderCapacity()" classname="com.example.app.service.BookingServiceTest" time="1.366"/>
+  <testcase name="cancelBooking_freeCancellation_refundsCreditHoursAndChargesNothing()" classname="com.example.app.service.BookingServiceTest" time="0.011"/>
+  <testcase name="createBooking_rejectsWithConflictWhenSpaceAtCapacity()" classname="com.example.app.service.BookingServiceTest" time="0.012"/>
+  <testcase name="cancelBooking_lateCancellation_feeIsBasedOnOriginalCostEvenWhenPaidWithCredit()" classname="com.example.app.service.BookingServiceTest" time="0.007"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (/home/himanshu.jangra/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.14.19/154da3a65b4f4a909d3e5bdec55d1b2b4cbb6ce1/byte-buddy-agent-1.14.19.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>

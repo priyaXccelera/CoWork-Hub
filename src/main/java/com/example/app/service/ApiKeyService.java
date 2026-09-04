@@ -14,8 +14,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class ApiKeyService {
 
   private final ApiKeyRepository apiKeyRepository;
@@ -54,6 +56,15 @@ public class ApiKeyService {
             .orElseThrow(() -> new ResourceNotFoundException("API key not found with id: " + id));
     apiKey.setActive(false);
     apiKeyRepository.save(apiKey);
+  }
+
+  /** Revokes every API key tied to a given user, e.g. when the user is soft-deleted. */
+  public void revokeAllForUser(Long userId) {
+    List<ApiKey> keys = apiKeyRepository.findByUserId(userId);
+    for (ApiKey key : keys) {
+      key.setActive(false);
+    }
+    apiKeyRepository.saveAll(keys);
   }
 
   public String generateAndStoreRawKeyForUser(Long userId, Role role, String name) {

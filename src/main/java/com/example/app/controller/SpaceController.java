@@ -25,7 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/spaces")
-@Tag(name = "Spaces", description = "Admin-only coworking space management")
+@Tag(
+    name = "Spaces",
+    description = "Space management (read access for any authenticated user, writes Admin-only)")
 public class SpaceController {
 
   private final SpaceService spaceService;
@@ -42,21 +44,22 @@ public class SpaceController {
   }
 
   @GetMapping
-  @Operation(summary = "List spaces with pagination and optional type filter (Admin only)")
+  @Operation(
+      summary =
+          "List spaces with pagination and optional type filter (any authenticated user, so"
+              + " Members can discover spaces to book)")
   public ResponseEntity<Page<SpaceResponse>> list(
       @RequestParam(required = false) SpaceType type,
       @RequestParam(defaultValue = "0") int offset,
       @RequestParam(defaultValue = "20") int limit) {
-    AccessGuard.requireAdmin();
     return ResponseEntity.ok(
         spaceService.list(
             type, OffsetPageRequest.of(offset, limit, Sort.by(Sort.Direction.ASC, "id"))));
   }
 
   @GetMapping("/{id}")
-  @Operation(summary = "Get a space by id (Admin only)")
+  @Operation(summary = "Get a space by id (any authenticated user)")
   public ResponseEntity<SpaceResponse> get(@PathVariable Long id) {
-    AccessGuard.requireAdmin();
     return ResponseEntity.ok(spaceService.get(id));
   }
 

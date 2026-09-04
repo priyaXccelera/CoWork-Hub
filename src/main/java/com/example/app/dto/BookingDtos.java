@@ -65,6 +65,7 @@ public class BookingDtos {
     private LocalDateTime endTime;
     private BookingStatus status;
     private BigDecimal costCharged;
+    private BigDecimal originalCost;
     private Double creditHoursUsed;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -123,6 +124,14 @@ public class BookingDtos {
 
     public void setCostCharged(BigDecimal costCharged) {
       this.costCharged = costCharged;
+    }
+
+    public BigDecimal getOriginalCost() {
+      return originalCost;
+    }
+
+    public void setOriginalCost(BigDecimal originalCost) {
+      this.originalCost = originalCost;
     }
 
     public Double getCreditHoursUsed() {

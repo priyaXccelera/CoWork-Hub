@@ -14,6 +14,21 @@ public final class BookingSpecifications {
 
   public static Specification<Booking> build(
       Long userId, LocalDate date, BookingStatus status, List<Long> spaceIds) {
+    return build(userId, date, null, null, status, spaceIds);
+  }
+
+  /**
+   * @param date optional single-day filter (matches bookings starting on that calendar day)
+   * @param from optional inclusive lower bound on startTime (date range filtering)
+   * @param to optional exclusive upper bound on startTime (date range filtering)
+   */
+  public static Specification<Booking> build(
+      Long userId,
+      LocalDate date,
+      LocalDateTime from,
+      LocalDateTime to,
+      BookingStatus status,
+      List<Long> spaceIds) {
     return (root, query, cb) -> {
       List<jakarta.persistence.criteria.Predicate> predicates = new ArrayList<>();
 
@@ -30,6 +45,12 @@ public final class BookingSpecifications {
             cb.and(
                 cb.lessThan(root.get("startTime"), end),
                 cb.greaterThanOrEqualTo(root.get("startTime"), start)));
+      }
+      if (from != null) {
+        predicates.add(cb.greaterThanOrEqualTo(root.get("startTime"), from));
+      }
+      if (to != null) {
+        predicates.add(cb.lessThan(root.get("startTime"), to));
       }
       if (spaceIds != null) {
         if (spaceIds.isEmpty()) {

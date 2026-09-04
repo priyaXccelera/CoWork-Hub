@@ -1,6 +1,8 @@
 package com.example.app.config;
 
 import com.example.app.security.ApiKeyFilter;
+import com.example.app.security.RestAccessDeniedHandler;
+import com.example.app.security.RestAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -15,9 +17,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
   private final ApiKeyFilter apiKeyFilter;
+  private final RestAuthenticationEntryPoint authenticationEntryPoint;
+  private final RestAccessDeniedHandler accessDeniedHandler;
 
-  public SecurityConfig(ApiKeyFilter apiKeyFilter) {
+  public SecurityConfig(
+      ApiKeyFilter apiKeyFilter,
+      RestAuthenticationEntryPoint authenticationEntryPoint,
+      RestAccessDeniedHandler accessDeniedHandler) {
     this.apiKeyFilter = apiKeyFilter;
+    this.authenticationEntryPoint = authenticationEntryPoint;
+    this.accessDeniedHandler = accessDeniedHandler;
   }
 
   @Bean
@@ -26,6 +35,10 @@ public class SecurityConfig {
         .cors(Customizer.withDefaults())
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .exceptionHandling(
+            ex ->
+                ex.authenticationEntryPoint(authenticationEntryPoint)
+                    .accessDeniedHandler(accessDeniedHandler))
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(

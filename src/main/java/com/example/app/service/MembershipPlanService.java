@@ -3,19 +3,26 @@ package com.example.app.service;
 import com.example.app.dto.MembershipPlanDtos.MembershipPlanRequest;
 import com.example.app.dto.MembershipPlanDtos.MembershipPlanResponse;
 import com.example.app.entity.MembershipPlan;
+import com.example.app.exception.ConflictException;
 import com.example.app.exception.ResourceNotFoundException;
 import com.example.app.repository.MembershipPlanRepository;
+import com.example.app.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class MembershipPlanService {
 
   private final MembershipPlanRepository membershipPlanRepository;
+  private final UserRepository userRepository;
 
-  public MembershipPlanService(MembershipPlanRepository membershipPlanRepository) {
+  public MembershipPlanService(
+      MembershipPlanRepository membershipPlanRepository, UserRepository userRepository) {
     this.membershipPlanRepository = membershipPlanRepository;
+    this.userRepository = userRepository;
   }
 
   public MembershipPlanResponse create(MembershipPlanRequest request) {
@@ -42,6 +49,12 @@ public class MembershipPlanService {
 
   public void delete(Long id) {
     MembershipPlan plan = findEntity(id);
+    if (userRepository.existsByMembershipPlan_IdAndDeletedFalse(id)) {
+      throw new ConflictException(
+          "Cannot delete membership plan with id "
+              + id
+              + ": it is still assigned to one or more active users");
+    }
     membershipPlanRepository.delete(plan);
   }
 

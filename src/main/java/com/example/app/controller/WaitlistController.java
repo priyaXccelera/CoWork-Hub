@@ -1,5 +1,6 @@
 package com.example.app.controller;
 
+import com.example.app.dto.WaitlistDtos.WaitlistJoinRequest;
 import com.example.app.dto.WaitlistDtos.WaitlistResponse;
 import com.example.app.security.AccessGuard;
 import com.example.app.security.CurrentActor;
@@ -7,10 +8,14 @@ import com.example.app.service.WaitlistService;
 import com.example.app.util.OffsetPageRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,13 +24,28 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/waitlist")
 @Tag(
     name = "Waitlist",
-    description = "Waitlist entries created automatically when a booking conflicts")
+    description =
+        "Join the waitlist for a fully booked space/slot; entries are auto-promoted to CONFIRMED"
+            + " as capacity frees up")
 public class WaitlistController {
 
   private final WaitlistService waitlistService;
 
   public WaitlistController(WaitlistService waitlistService) {
     this.waitlistService = waitlistService;
+  }
+
+  @PostMapping
+  @Operation(
+      summary =
+          "Join the waitlist for a space/time-slot (Members join for themselves, Admins can join"
+              + " on behalf of any user)")
+  public ResponseEntity<WaitlistResponse> join(@Valid @RequestBody WaitlistJoinRequest request) {
+    boolean isAdmin = CurrentActor.isAdmin();
+    Long actorUserId =
+        isAdmin ? CurrentActor.currentUserId() : AccessGuard.requireAuthenticatedUserId();
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(waitlistService.join(request, actorUserId, isAdmin));
   }
 
   @GetMapping

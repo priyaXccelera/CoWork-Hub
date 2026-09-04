@@ -58,8 +58,11 @@ public class InvoiceController {
   }
 
   @GetMapping("/{id}")
-  @Operation(summary = "Get an invoice by id")
+  @Operation(summary = "Get an invoice by id (own invoice for Members, any for Admin)")
   public ResponseEntity<InvoiceResponse> get(@PathVariable Long id) {
-    return ResponseEntity.ok(invoiceService.get(id));
+    boolean isAdmin = CurrentActor.isAdmin();
+    Long actorUserId =
+        isAdmin ? CurrentActor.currentUserId() : AccessGuard.requireAuthenticatedUserId();
+    return ResponseEntity.ok(invoiceService.get(id, actorUserId, isAdmin));
   }
 }

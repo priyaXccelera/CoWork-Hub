@@ -40,6 +40,16 @@ public class Booking {
   @Column(name = "cost_charged", nullable = false)
   private BigDecimal costCharged = BigDecimal.ZERO;
 
+  /**
+   * The full monetary value of the booking at the time it was made (space hourly rate x hours),
+   * regardless of how much of it was actually paid in cash vs. covered by membership credit
+   * hours. Preserved permanently so that cancellation fees and historical records always have a
+   * reference to what the booking was originally worth, even after {@link #costCharged} is
+   * overwritten with a cancellation fee.
+   */
+  @Column(name = "original_cost", nullable = false)
+  private BigDecimal originalCost = BigDecimal.ZERO;
+
   @Column(name = "credit_hours_used", nullable = false)
   private Double creditHoursUsed = 0.0;
 
@@ -115,6 +125,14 @@ public class Booking {
 
   public void setCostCharged(BigDecimal costCharged) {
     this.costCharged = costCharged;
+  }
+
+  public BigDecimal getOriginalCost() {
+    return originalCost;
+  }
+
+  public void setOriginalCost(BigDecimal originalCost) {
+    this.originalCost = originalCost;
   }
 
   public Double getCreditHoursUsed() {

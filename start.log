@@ -43,3 +43,6 @@ This generated password is for development use only. Your security configuration
 2026-09-04T07:10:26.898Z  INFO 1113160 --- [CoWork Hub] [io-21512-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
 2026-09-04T07:10:26.900Z  INFO 1113160 --- [CoWork Hub] [io-21512-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
 2026-09-04T07:10:32.145Z  INFO 1113160 --- [CoWork Hub] [io-21512-exec-1] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 779 ms
+2026-09-04T07:55:00.583Z  INFO 1113160 --- [CoWork Hub] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-09-04T07:55:00.592Z  INFO 1113160 --- [CoWork Hub] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-09-04T07:55:00.599Z  INFO 1113160 --- [CoWork Hub] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

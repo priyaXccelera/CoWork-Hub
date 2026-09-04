@@ -4,6 +4,7 @@ import com.example.app.dto.BookingDtos.BookingRequest;
 import com.example.app.dto.BookingDtos.BookingResponse;
 import com.example.app.entity.BookingStatus;
 import com.example.app.entity.SpaceType;
+import com.example.app.exception.BusinessRuleException;
 import com.example.app.security.AccessGuard;
 import com.example.app.security.CurrentActor;
 import com.example.app.service.BookingService;
@@ -12,6 +13,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -46,27 +49,80 @@ public class BookingController {
         .body(bookingService.createBooking(request, actorUserId, isAdmin));
   }
 
+  private static final Set<String> SORTABLE_FIELDS =
+      Set.of("startTime", "endTime", "createdAt", "updatedAt", "costCharged", "status", "id");
+
   @GetMapping
   @Operation(
-      summary = "List bookings with pagination, sorting and filtering by date/status/spaceType")
+      summary =
+          "List bookings with pagination, sorting and filtering by date/date-range/status/"
+              + "spaceType. Date range accepts from/to or startDate/endDate (inclusive, "
+              + "yyyy-MM-dd). Sort accepts '<field>,<asc|desc>', e.g. 'startTime,asc'.")
   public ResponseEntity<Page<BookingResponse>> list(
       @RequestParam(required = false) LocalDate date,
+      @RequestParam(required = false) LocalDate from,
+      @RequestParam(required = false) LocalDate to,
+      @RequestParam(required = false) LocalDate startDate,
+      @RequestParam(required = false) LocalDate endDate,
       @RequestParam(required = false) BookingStatus status,
       @RequestParam(required = false) SpaceType spaceType,
+      @RequestParam(required = false) String sort,
       @RequestParam(defaultValue = "0") int offset,
       @RequestParam(defaultValue = "20") int limit) {
     boolean isAdmin = CurrentActor.isAdmin();
     Long actorUserId =
         isAdmin ? CurrentActor.currentUserId() : AccessGuard.requireAuthenticatedUserId();
+
+    LocalDate effectiveFrom = from != null ? from : startDate;
+    LocalDate effectiveTo = to != null ? to : endDate;
+    LocalDateTime fromDateTime = effectiveFrom != null ? effectiveFrom.atStartOfDay() : null;
+    // Upper bound is exclusive, so add a day to make the "to"/"endDate" date inclusive.
+    LocalDateTime toDateTime = effectiveTo != null ? effectiveTo.plusDays(1).atStartOfDay() : null;
+    if (fromDateTime != null && toDateTime != null && !toDateTime.isAfter(fromDateTime)) {
+      throw new BusinessRuleException("'to'/'endDate' must not be before 'from'/'startDate'");
+    }
+
     Page<BookingResponse> page =
         bookingService.list(
             actorUserId,
             isAdmin,
             date,
+            fromDateTime,
+            toDateTime,
             status,
             spaceType,
-            OffsetPageRequest.of(offset, limit, Sort.by(Sort.Direction.DESC, "startTime")));
+            OffsetPageRequest.of(offset, limit, parseSort(sort)));
     return ResponseEntity.ok(page);
+  }
+
+  private Sort parseSort(String sort) {
+    String field = "startTime";
+    Sort.Direction direction = Sort.Direction.DESC;
+    if (sort != null && !sort.isBlank()) {
+      String[] parts = sort.split(",");
+      field = parts[0].trim();
+      if (!SORTABLE_FIELDS.contains(field)) {
+        throw new BusinessRuleException(
+            "Invalid sort field '" + field + "'. Allowed values: " + SORTABLE_FIELDS);
+      }
+      if (parts.length > 1) {
+        String dir = parts[1].trim();
+        if ("asc".equalsIgnoreCase(dir)) {
+          direction = Sort.Direction.ASC;
+        } else if ("desc".equalsIgnoreCase(dir)) {
+          direction = Sort.Direction.DESC;
+        } else {
+          throw new BusinessRuleException(
+              "Invalid sort direction '" + dir + "'. Allowed values: asc, desc");
+        }
+      }
+    }
+    // Always break ties on id so repeated identical queries return a stable, deterministic order
+    // even when multiple bookings share the same value for the sorted field (e.g. startTime).
+    if ("id".equals(field)) {
+      return Sort.by(direction, "id");
+    }
+    return Sort.by(direction, field).and(Sort.by(Sort.Direction.ASC, "id"));
   }
 
   @GetMapping("/{id}")

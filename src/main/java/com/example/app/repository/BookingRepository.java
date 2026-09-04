@@ -1,11 +1,13 @@
 package com.example.app.repository;
 
 import com.example.app.entity.Booking;
+import com.example.app.entity.BookingStatus;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -22,6 +24,23 @@ public interface BookingRepository
 
   List<Booking> findByUserId(Long userId);
 
+  /** Used to block deletion of a space/user that still has active or future bookings. */
+  boolean existsBySpaceIdAndStatusInAndEndTimeAfter(
+      Long spaceId, List<BookingStatus> statuses, LocalDateTime after);
+
+  boolean existsByUserIdAndStatusInAndEndTimeAfter(
+      Long userId, List<BookingStatus> statuses, LocalDateTime after);
+
+  @Modifying
+  @Query(
+      "update Booking b set b.status = 'COMPLETED', b.updatedAt = CURRENT_TIMESTAMP "
+          + "where b.status = 'CONFIRMED' and b.endTime <= :now")
+  int completePastBookings(@Param("now") LocalDateTime now);
+
+  // Revenue and booking-count use the same status set (CONFIRMED, COMPLETED, CANCELLED) so the
+  // two figures reported together stay consistent: cancelled bookings still contribute their
+  // cancellation fee to revenue and are counted as a booking transaction that occurred in the
+  // period.
   @Query(
       "select coalesce(sum(b.costCharged), 0) from Booking b where b.startTime >= :from and"
           + " b.startTime < :to and b.status in ('CONFIRMED', 'COMPLETED', 'CANCELLED')")
@@ -29,7 +48,7 @@ public interface BookingRepository
 
   @Query(
       "select count(b) from Booking b where b.startTime >= :from and b.startTime < :to "
-          + "and b.status in ('CONFIRMED', 'COMPLETED')")
+          + "and b.status in ('CONFIRMED', 'COMPLETED', 'CANCELLED')")
   long countBookingsBetween(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
 
   @Query(

@@ -2,21 +2,33 @@ package com.example.app.service;
 
 import com.example.app.dto.SpaceDtos.SpaceRequest;
 import com.example.app.dto.SpaceDtos.SpaceResponse;
+import com.example.app.entity.BookingStatus;
 import com.example.app.entity.Space;
 import com.example.app.entity.SpaceType;
+import com.example.app.exception.ConflictException;
 import com.example.app.exception.ResourceNotFoundException;
+import com.example.app.repository.BookingRepository;
 import com.example.app.repository.SpaceRepository;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class SpaceService {
 
-  private final SpaceRepository spaceRepository;
+  private static final List<BookingStatus> ACTIVE_STATUSES =
+      List.of(BookingStatus.CONFIRMED, BookingStatus.WAITLISTED);
 
-  public SpaceService(SpaceRepository spaceRepository) {
+  private final SpaceRepository spaceRepository;
+  private final BookingRepository bookingRepository;
+
+  public SpaceService(SpaceRepository spaceRepository, BookingRepository bookingRepository) {
     this.spaceRepository = spaceRepository;
+    this.bookingRepository = bookingRepository;
   }
 
   public SpaceResponse create(SpaceRequest request) {
@@ -46,6 +58,17 @@ public class SpaceService {
 
   public void delete(Long id) {
     Space space = findEntity(id);
+
+    boolean hasActiveOrFutureBookings =
+        bookingRepository.existsBySpaceIdAndStatusInAndEndTimeAfter(
+            id, ACTIVE_STATUSES, LocalDateTime.now());
+    if (hasActiveOrFutureBookings) {
+      throw new ConflictException(
+          "Cannot delete space with id "
+              + id
+              + ": it has active or future bookings. Cancel those bookings first.");
+    }
+
     space.setDeleted(true);
     space.setActive(false);
     spaceRepository.save(space);

@@ -3,6 +3,7 @@ package com.example.app.controller;
 import com.example.app.dto.ReportDtos.MonthlyRevenueResponse;
 import com.example.app.dto.ReportDtos.SpaceUtilizationResponse;
 import com.example.app.dto.ReportDtos.TopMemberResponse;
+import com.example.app.exception.BusinessRuleException;
 import com.example.app.security.AccessGuard;
 import com.example.app.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,6 +47,9 @@ public class ReportController {
   public ResponseEntity<List<TopMemberResponse>> topMembers(
       @RequestParam(defaultValue = "5") int limit) {
     AccessGuard.requireAdmin();
+    if (limit < 1 || limit > 100) {
+      throw new BusinessRuleException("limit must be between 1 and 100");
+    }
     return ResponseEntity.ok(reportService.topMembers(limit));
   }
 }
